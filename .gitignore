@@ -2,7 +2,7 @@
 .classpath
 .project
 .settings
-
+*.xml
 # maven
 target/
 */src/main/java/META-INF/
