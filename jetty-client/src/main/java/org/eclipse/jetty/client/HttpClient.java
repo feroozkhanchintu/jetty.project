@@ -107,7 +107,9 @@ import org.eclipse.jetty.util.thread.Scheduler;
 @ManagedObject("The HTTP client")
 public class HttpClient extends ContainerLifeCycle
 {
-    private static final Logger LOG = Log.getLogger(HttpClient.class);
+    private HttpClientProduct httpClientProduct = new HttpClientProduct();
+
+	private static final Logger LOG = Log.getLogger(HttpClient.class);
 
     private final ConcurrentMap<Origin, HttpDestination> destinations = new ConcurrentHashMap<>();
     private final ProtocolHandlers handlers = new ProtocolHandlers();
@@ -123,7 +125,6 @@ public class HttpClient extends ContainerLifeCycle
     private volatile ByteBufferPool byteBufferPool;
     private volatile Scheduler scheduler;
     private volatile SocketAddressResolver resolver;
-    private volatile HttpField agentField = new HttpField(HttpHeader.USER_AGENT, "Jetty/" + Jetty.VERSION);
     private volatile boolean followRedirects = true;
     private volatile int maxConnectionsPerDestination = 64;
     private volatile int maxRequestsQueuedPerDestination = 1024;
@@ -701,7 +702,7 @@ public class HttpClient extends ContainerLifeCycle
      */
     public HttpField getUserAgentField()
     {
-        return agentField;
+        return httpClientProduct.getAgentField();
     }
 
     /**
@@ -709,10 +710,7 @@ public class HttpClient extends ContainerLifeCycle
      */
     public void setUserAgentField(HttpField agent)
     {
-        if (agent.getHeader() != HttpHeader.USER_AGENT) {
-			throw new IllegalArgumentException();
-		}
-        this.agentField = agent;
+        httpClientProduct.setUserAgentField(agent);
     }
 
     /**

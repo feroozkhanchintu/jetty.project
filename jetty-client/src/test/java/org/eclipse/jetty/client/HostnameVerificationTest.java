@@ -42,8 +42,8 @@ import org.junit.Test;
  */
 public class HostnameVerificationTest
 {
-    private SslContextFactory clientSslContextFactory = new SslContextFactory();
-    private Server server = new Server();
+    private HostnameVerificationTestProduct hostnameVerificationTestProduct = new HostnameVerificationTestProduct();
+	private SslContextFactory clientSslContextFactory = new SslContextFactory();
     private HttpClient client;
     private NetworkConnector connector;
 
@@ -53,9 +53,9 @@ public class HostnameVerificationTest
         SslContextFactory serverSslContextFactory = new SslContextFactory();
         serverSslContextFactory.setKeyStorePath("src/test/resources/keystore.jks");
         serverSslContextFactory.setKeyStorePassword("storepwd");
-        connector = new ServerConnector(server, serverSslContextFactory);
-        server.addConnector(connector);
-        server.setHandler(new DefaultHandler()
+        connector = new ServerConnector(hostnameVerificationTestProduct.getServer(), serverSslContextFactory);
+        hostnameVerificationTestProduct.getServer().addConnector(connector);
+        hostnameVerificationTestProduct.getServer().setHandler(new DefaultHandler()
         {
             @Override
             public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
@@ -64,7 +64,7 @@ public class HostnameVerificationTest
                 response.getWriter().write("foobar");
             }
         });
-        server.start();
+        hostnameVerificationTestProduct.getServer().start();
 
         // keystore contains a hostname which doesn't match localhost
         clientSslContextFactory.setKeyStorePath("src/test/resources/keystore.jks");
@@ -80,9 +80,7 @@ public class HostnameVerificationTest
     @After
     public void tearDown() throws Exception
     {
-        client.stop();
-        server.stop();
-        server.join();
+        hostnameVerificationTestProduct.tearDown(client);
     }
 
     /**
